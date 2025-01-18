@@ -1,5 +1,6 @@
 package project.bettergymapp.data.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -19,8 +20,10 @@ class RoutineViewModel(
     private val _list = MutableStateFlow<List<Routine>>(listOf())
     val list = _list.asStateFlow()
 
+
     init {
         getAllRoutines()
+        Log.d("RoutineViewModel", "list: $_list")
     }
 
     private fun getAllRoutines() {
@@ -31,6 +34,26 @@ class RoutineViewModel(
                 _list.tryEmit(it)
             }
         }
+    }
+
+    fun routineCount(): Int {
+        return _list.value.size
+    }
+
+    fun getRoutine(index: Int): Routine {
+        return _list.value[index]
+    }
+
+    fun highestId(): Int {
+        var highestId = 0
+        viewModelScope.launch {
+            try {
+                highestId = repository.highestId()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return highestId
     }
 
     fun insert(item: Routine) {
@@ -62,6 +85,17 @@ class RoutineViewModel(
             }
         }
     }
+
+    fun save() {
+        viewModelScope.launch {
+            try {
+                repository.save()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

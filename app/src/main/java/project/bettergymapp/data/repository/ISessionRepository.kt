@@ -9,4 +9,5 @@ interface ISessionRepository {
     suspend fun insert(session: Session)
     suspend fun delete(session: Session)
     suspend fun update(session: Session)
+    suspend fun save()
 }

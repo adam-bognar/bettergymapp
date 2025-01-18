@@ -1,5 +1,6 @@
 package project.bettergymapp.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,9 +36,10 @@ fun RoutineSelection(
     onNavigateToRoutineAdd: () -> Unit,
     onNavigateToExerciseAdd: (routine: Routine) -> Unit,
     viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
-    onStart: (Routine) -> Unit = {}
+    onStart: (Routine) -> Unit = {},
 ) {
     val list = viewModel.list.collectAsStateWithLifecycle().value
+    Log.d("RoutineSelection", "list: $list")
     val colors = List(list.size) { index ->
         val colorResources = listOf(
             R.color.happyblue,
@@ -64,7 +66,8 @@ fun RoutineSelection(
             )
             IconButton(
                 onClick = {
-                    onNavigateToRoutineAdd()
+                    //onNavigateToRoutineAdd()
+                    addRoutine.value = true
                 },
                 modifier = Modifier.size(48.dp) // Adjust the size as needed
             ) {
@@ -88,7 +91,13 @@ fun RoutineSelection(
                 onDismissRequest = { addRoutine.value = false },
                 onConfirmation = { name ->
                     if (name != "") {
-                        viewModel.insert(Routine(name = name, description = ""))
+
+                        viewModel.insert(Routine(
+                            id = viewModel.highestId() + 1,
+                            name = name,
+                            exercises = emptyList(),
+                            description = ""
+                        ))
                     }
                     addRoutine.value = false
                 }

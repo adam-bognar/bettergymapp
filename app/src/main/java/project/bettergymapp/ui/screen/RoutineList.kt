@@ -191,6 +191,8 @@ fun RoutineList(
                         .weight(2f)
                         .size(buttonSize),
                     onClick = {
+                        val id = list[pagerState.currentPage].id
+
                         onNavigateToExerciseAdd(list[pagerState.currentPage])
                     },
                     shape = RoundedCornerShape(cornerRadius),

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import project.bettergymapp.MainActivity
+import project.bettergymapp.SIGN_UP_SCREEN
+import project.bettergymapp.SPLASH_SCREEN
 import project.bettergymapp.data.service.AccountService
 import project.bettergymapp.data.viewmodel.AppViewModel
 import javax.inject.Inject
@@ -26,12 +28,12 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick(openAndPopUp: (String) -> Unit) {
         launchCatching {
             accountService.signIn(email.value, password.value)
-            openAndPopUp("home")
+            openAndPopUp(SPLASH_SCREEN)
         }
     }
 
     fun onSignUpClick(openAndPopUp: (String) -> Unit) {
-        openAndPopUp("sign up")
+        openAndPopUp(SIGN_UP_SCREEN)
     }
 
     companion object {

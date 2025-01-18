@@ -21,7 +21,15 @@ class RoomRoutinesRepository(private val dao: RoutineDao) : IRoutineRepository {
         dao.update(routine)
     }
 
+    override suspend fun highestId(): Int {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun deleteAll() {
         dao.deleteAll() // Implement this function
+    }
+
+    override suspend fun save() {
+        TODO("Not yet implemented")
     }
 }

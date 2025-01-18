@@ -8,5 +8,7 @@ interface IExerciseRepository {
     suspend fun insert(exercise: Exercise)
     suspend fun delete(exercise: Exercise)
     suspend fun update(exercise: Exercise)
+    suspend fun save()
+
 
 }

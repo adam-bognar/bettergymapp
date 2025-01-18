@@ -13,15 +13,21 @@ import project.bettergymapp.data.Routine
 fun MainScreen(
     onNavigateToWorkout: (routine: Routine) -> Unit = {},
     onNavigateToRoutineAdd: () -> Unit = {},
-    onNavigateToExerciseAdd: (routine: Routine) -> Unit = {}
+    onNavigateToExerciseAdd: (routine: Routine) -> Unit = {},
+    openAndPopUp: (String) -> Unit = {}
 ){
+
+
 
 
     Column(modifier = Modifier.fillMaxSize()
         .background(colorResource(R.color.beige))
     )
     {
-        TopAppBar("username")
+        TopAppBar(
+            "username",
+            openAndPopUp = openAndPopUp
+        )
         RoutineSelection(onStart = onNavigateToWorkout, onNavigateToRoutineAdd = onNavigateToRoutineAdd, onNavigateToExerciseAdd = onNavigateToExerciseAdd)
     }
 }
