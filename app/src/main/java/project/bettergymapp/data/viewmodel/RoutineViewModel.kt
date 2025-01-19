@@ -40,8 +40,13 @@ class RoutineViewModel(
         return _list.value.size
     }
 
-    fun getRoutine(index: Int): Routine {
-        return _list.value[index]
+    fun getRoutine(id: Int): Routine {
+        for (routine in _list.value) {
+            if (routine.id == id) {
+                return routine
+            }
+        }
+        return Routine()
     }
 
     fun highestId(): Int {

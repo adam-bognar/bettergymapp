@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
@@ -39,15 +40,16 @@ fun WorkoutPage(
     onNavigateBack: () -> Unit,
     routineViewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
     exerciseViewModel: ExerciseViewModel = viewModel(factory = ExerciseViewModel.Factory),
-    sessionViewModel: SessionViewModel = viewModel(factory = SessionViewModel.Factory)
+    sessionViewModel: SessionViewModel = viewModel(factory = SessionViewModel.Factory),
+    onNavigateToExerciseAdd: (routine: Routine) -> Unit,
+    navController: NavController
 ) {
-    var exercises by remember { mutableStateOf(routine.exercises) }
-    val addExercise = remember { mutableStateOf(false) }
+    var exercises by remember { mutableStateOf(routineViewModel.getRoutine(routine.id).exercises) }
+    Log.d("WorkoutPage", "exercises: $exercises")
     val showTimer = remember { mutableStateOf(false) }
     var showTimerSettings by remember { mutableStateOf(false) }
     var isSwitched by remember { mutableStateOf(true) }
     var timerTime by remember { mutableIntStateOf(120) }
-
 
 
     Box(
@@ -86,7 +88,9 @@ fun WorkoutPage(
 
                 item {
                     TextButton(
-                        onClick = { addExercise.value = true },
+                        onClick = {
+                            onNavigateToExerciseAdd(routine.copy(exercises = exercises))
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 20.dp, bottom = 10.dp),
@@ -104,18 +108,9 @@ fun WorkoutPage(
                 }
             }
 
-            if (addExercise.value) {
-                AddExerciseDialog(
-                    onDismissRequest = { addExercise.value = false },
-                    onConfirmation = { name ->
-                        exercises = exercises + Exercise(name = name)
-                        addExercise.value = false
-                    }
-                )
-            }
         }
 
-        if(!isSwitched){
+        if (!isSwitched) {
             showTimer.value = false
         }
 
@@ -152,7 +147,7 @@ fun WorkoutPage(
 
 fun sessionToFirebase(exercises: List<Exercise>, sessionViewModel: SessionViewModel) {
     val session = Session(
-        id=sessionViewModel.highestId()+1,
+        id = sessionViewModel.highestId() + 1,
         //date = Timestamp.now(),
         duration = 0,
         log = exercises

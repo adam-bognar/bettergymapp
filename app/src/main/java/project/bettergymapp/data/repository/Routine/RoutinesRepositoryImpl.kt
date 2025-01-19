@@ -33,7 +33,9 @@ class RoutinesRepositoryImpl(
     override fun getAllRoutines(): Flow<List<Routine>> = _routinesFlow.asStateFlow()
 
     override suspend fun upsert(routine: Routine) {
-        collection.document(routine.id.toString()).set(routine)
+        collection.document(routine.id.toString()).set(routine).addOnSuccessListener {
+            _routinesFlow.value = _routinesFlow.value.map { if (it.id == routine.id) routine else it }
+        }
     }
 
     override suspend fun delete(routine: Routine) {

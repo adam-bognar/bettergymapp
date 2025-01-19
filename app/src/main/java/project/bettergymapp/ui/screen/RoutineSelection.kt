@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,7 +40,7 @@ fun RoutineSelection(
     onStart: (Routine) -> Unit = {},
 
 ) {
-    val list = viewModel.list.collectAsStateWithLifecycle().value
+    val list by viewModel.list.collectAsStateWithLifecycle()
     Log.d("RoutineSelection", "list: $list")
     val colors = List(list.size) { index ->
         val colorResources = listOf(

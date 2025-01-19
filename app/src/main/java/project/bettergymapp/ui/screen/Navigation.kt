@@ -61,7 +61,12 @@ fun NavGraph(
             WorkoutPage(routine,
                 onNavigateBack = {
                     navController.navigate(HOME_SCREEN)
-                }
+                },
+                onNavigateToExerciseAdd = { update ->
+                    val routineJson2 = Gson().toJson(update)
+                    navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson2")
+                },
+                navController = navController
             )
         }
 
@@ -102,6 +107,7 @@ fun NavGraph(
                 onSelected = { update ->
                     val previousBackStackEntry = navController.previousBackStackEntry
                     val previousRoute = previousBackStackEntry?.destination?.route
+                    Log.d("NavGraph", "Previous route: $previousRoute")
 
                     if (previousRoute != null) {
                         // Do something based on the previous route
@@ -114,6 +120,10 @@ fun NavGraph(
                                 // Handle the case when the previous screen was "routine add"
                                 val updateRoutineJson = Gson().toJson(update)
                                 previousBackStackEntry.savedStateHandle.set("updatedRoutine", updateRoutineJson)
+                                Log.d("NavGraph", "Updated routine: ${update.exercises.joinToString { it.name }}")
+                            }
+                            "$WORKOUT_SCREEN/{routine}" -> {
+                                viewModel.upsert(update)
                                 Log.d("NavGraph", "Updated routine: ${update.exercises.joinToString { it.name }}")
                             }
                             // Add more cases as needed
