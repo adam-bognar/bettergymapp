@@ -2,6 +2,7 @@ package project.bettergymapp.ui.screen
 
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,18 +10,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import project.bettergymapp.EXERCISE_ADD_SCREEN
 import project.bettergymapp.HOME_SCREEN
-import project.bettergymapp.MainActivity
 import project.bettergymapp.ROUTINE_ADD_SCREEN
 import project.bettergymapp.SIGN_IN_SCREEN
 import project.bettergymapp.SIGN_UP_SCREEN
 import project.bettergymapp.SPLASH_SCREEN
 import project.bettergymapp.WORKOUT_SCREEN
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.viewmodel.RoutineViewModel
 import project.bettergymapp.ui.screen.sign_in.LoginPage
 import project.bettergymapp.ui.screen.sign_up.RegisterPage
 import project.bettergymapp.ui.screen.splash.SplashScreen
@@ -70,6 +68,8 @@ fun NavGraph(
         composable(
             ROUTINE_ADD_SCREEN
         ) {
+            val viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
+
             RoutineEditScreen(
                 onNavigateBack = {
                     navController.navigate(HOME_SCREEN)
@@ -79,6 +79,7 @@ fun NavGraph(
                     navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson2")
                 },
                 routine = Routine(
+                    id = viewModel.highestId() + 1,
                     name = "",
                     description = ""
                 ),
@@ -91,6 +92,8 @@ fun NavGraph(
         ) { backStackEntry ->
             val routineJson = backStackEntry.arguments?.getString("routine")
             val routine = Gson().fromJson(routineJson, Routine::class.java)
+            val viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
+
             ExerciseScreen(
                 routine = routine,
                 onNavigateBack = {
@@ -105,9 +108,7 @@ fun NavGraph(
                         when (previousRoute) {
                             HOME_SCREEN -> {
                                 // Handle the case when the previous screen was "home"
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    MainActivity.routineRepository.update(update)
-                                }
+                                viewModel.upsert(update)
                             }
                             ROUTINE_ADD_SCREEN -> {
                                 // Handle the case when the previous screen was "routine add"

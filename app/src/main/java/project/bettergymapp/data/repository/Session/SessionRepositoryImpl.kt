@@ -32,42 +32,17 @@ class SessionRepositoryImpl(
 
     override fun getAllSessions(): Flow<List<Session>> = _sessionsFlow.asStateFlow()
 
-    override suspend fun insert(session: Session) {
-        collection.add(session).addOnSuccessListener {
-            _sessionsFlow.value += session
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+    override suspend fun upsert(session: Session) {
+        collection.document(session.id.toString()).set(session)
     }
 
     override suspend fun delete(session: Session) {
         val routineDoc = collection.document(session.id.toString())
-        routineDoc.delete().addOnSuccessListener {
-            _sessionsFlow.value -= session
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+        routineDoc.delete()
     }
 
-    override suspend fun update(session: Session) {
-        val routineDoc = collection.document(session.id.toString())
-        routineDoc.set(session).addOnSuccessListener {
-            _sessionsFlow.value = _sessionsFlow.value.map {
-                if (it.id == session.id) session else it
-            }
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+    override suspend fun highestId(): Int {
+        return _sessionsFlow.value.maxOfOrNull { it.id } ?: 0
     }
 
-
-    override suspend fun save() {
-        val routines = _sessionsFlow.value
-        for (routine in routines) {
-            val routineDoc = collection.document(routine.id.toString())
-            routineDoc.set(routine).addOnFailureListener { exception ->
-                // Handle exception
-            }
-        }
-    }
 }

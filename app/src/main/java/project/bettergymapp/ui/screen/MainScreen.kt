@@ -14,7 +14,7 @@ fun MainScreen(
     onNavigateToWorkout: (routine: Routine) -> Unit = {},
     onNavigateToRoutineAdd: () -> Unit = {},
     onNavigateToExerciseAdd: (routine: Routine) -> Unit = {},
-    openAndPopUp: (String) -> Unit = {}
+    openAndPopUp: (String) -> Unit = {},
 ){
 
 

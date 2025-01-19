@@ -32,42 +32,16 @@ class ExerciseRepositoryImpl(
 
     override fun getAllExercises(): Flow<List<Exercise>> = _exercisesFlow.asStateFlow()
 
-    override suspend fun insert(exercise: Exercise) {
-        collection.add(exercise).addOnSuccessListener {
-            _exercisesFlow.value += exercise
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+    override suspend fun upsert(exercise: Exercise) {
+        collection.document(exercise.id.toString()).set(exercise)
     }
 
     override suspend fun delete(exercise: Exercise) {
         val routineDoc = collection.document(exercise.id.toString())
-        routineDoc.delete().addOnSuccessListener {
-            _exercisesFlow.value -= exercise
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+        routineDoc.delete()
     }
 
-    override suspend fun update(exercise: Exercise) {
-        val routineDoc = collection.document(exercise.id.toString())
-        routineDoc.set(exercise).addOnSuccessListener {
-            _exercisesFlow.value = _exercisesFlow.value.map {
-                if (it.id == exercise.id) exercise else it
-            }
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
-    }
 
-    override suspend fun save() {
-        val exercises = _exercisesFlow.value
-        for (exercise in exercises) {
-            val exerciseDoc = collection.document(exercise.id.toString())
-            exerciseDoc.set(exercise).addOnFailureListener { exception ->
-                // Handle exception
-            }
-        }
-    }
+
 
 }

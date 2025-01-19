@@ -1,5 +1,6 @@
 package project.bettergymapp.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.ExerciseLog
-
+import project.bettergymapp.data.RepsToWeight
 @Composable
 fun WorkoutItem(
     exercise: Exercise,
@@ -44,15 +45,14 @@ fun WorkoutItem(
     onDoneClick: () -> Unit = {}
 ) {
 
-    var logs by remember { mutableStateOf(exercise.lastLog?.sets?.toList() ?: listOf()) }
-    val newLogs by remember { mutableStateOf(mutableListOf<Pair<Int, Int>>()) }
+    var logs by remember { mutableStateOf(exercise.lastLog?.sets ?: listOf()) }
+    val newLogs by remember { mutableStateOf(mutableListOf<RepsToWeight>()) }
 
     if (logs.isEmpty()) {
-        logs = List(3) { 0 to 0 }
+        logs = List(3) { RepsToWeight() }
     } else if (logs.size < 3) {
-        logs = logs + List(3 - logs.size) { 0 to 0 }
+        logs = logs + List(3 - logs.size) { RepsToWeight() }
     }
-
 
     Column(
         modifier = Modifier
@@ -60,7 +60,6 @@ fun WorkoutItem(
             .padding(top = 10.dp, start = 10.dp, end = 10.dp)
             .clip(shape = RoundedCornerShape(20.dp))
             .background(colorResource(id = R.color.top_app_bar))
-
     ) {
         Text(
             text = exercise.name,
@@ -75,12 +74,10 @@ fun WorkoutItem(
             textAlign = TextAlign.Center
         )
 
-
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding( bottom = 18.dp)
+                .padding(bottom = 18.dp)
         ) {
             Text(text = "SET", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             Text(text = "PREVIOUS", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
@@ -95,25 +92,23 @@ fun WorkoutItem(
                 previous = log,
                 onTick = { kg, reps, isChecked ->
                     if (isChecked) {
-                        val kgValue = if (kg.isEmpty()) log.second else kg.toInt()
-                        val repsValue = if (reps.isEmpty()) log.first else reps.toInt()
-                        newLogs.add(repsValue to kgValue)
+                        val kgValue = if (kg.isEmpty()) log.weight else kg.toInt()
+                        val repsValue = if (reps.isEmpty()) log.reps else reps.toInt()
+                        newLogs.add(RepsToWeight(reps = repsValue, weight = kgValue))
                         onDoneClick()
                     } else {
-                        newLogs.removeIf { it.first == log.first && it.second == log.second }
+                        newLogs.removeIf { it.reps == log.reps && it.weight == log.weight }
                     }
                     val updatedExercise = exercise.copy(lastLog = ExerciseLog(sets = newLogs.toList()))
+                    Log.d("WorkoutItem", "Updated exercise: $updatedExercise")
                     onUpdate(updatedExercise)
-
                 },
-
             )
         }
 
-
         TextButton(
             onClick = {
-                logs = logs + List(1) { 0 to 0 }
+                logs = logs + List(1) { RepsToWeight() }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -125,7 +120,7 @@ fun WorkoutItem(
 @Composable
 private fun DataRow(
     setNumber: Int,
-    previous: Pair<Int, Int>,
+    previous: RepsToWeight,
     onTick: (String, String, Boolean) -> Unit,
 ) {
 
@@ -140,12 +135,16 @@ private fun DataRow(
     ) {
         Text(
             text = setNumber.toString(),
-            modifier = Modifier.weight(1f).height(24.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(24.dp),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "${previous.second}kg x ${previous.first}",
-            modifier = Modifier.weight(1f).height(24.dp),
+            text = "${previous.weight}kg x ${previous.reps}",
+            modifier = Modifier
+                .weight(1f)
+                .height(24.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(color = Color.Gray)
 
@@ -153,13 +152,13 @@ private fun DataRow(
         PlaceholderTextField(
             value = kgInput,
             onValueChange = { kgInput = it },
-            placeholder = previous.second.toString(),
+            placeholder = previous.weight.toString(),
             modifier = Modifier.weight(1f)
         )
         PlaceholderTextField(
             value = repsInput,
             onValueChange = { repsInput = it },
-            placeholder = previous.first.toString(),
+            placeholder = previous.reps.toString(),
             modifier = Modifier.weight(1f)
         )
         IconButton(
@@ -168,7 +167,9 @@ private fun DataRow(
                 onTick(kgInput, repsInput, isChecked)
 
             },
-            modifier = Modifier.weight(1f).height(24.dp)
+            modifier = Modifier
+                .weight(1f)
+                .height(24.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
@@ -187,21 +188,27 @@ fun PlaceholderTextField(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = TextStyle(fontSize = 16.sp, textAlign = TextAlign.Center)
 ) {
-    Box(modifier = modifier.wrapContentSize(),
-        contentAlignment = Alignment.Center) {
+    Box(
+        modifier = modifier.wrapContentSize(),
+        contentAlignment = Alignment.Center
+    ) {
         if (value.isEmpty()) {
             Text(
                 text = placeholder,
                 style = textStyle.copy(color = Color.Gray),
-                modifier = Modifier.height(24.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .height(24.dp)
+                    .fillMaxWidth(),
 
-            )
+                )
         }
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             textStyle = textStyle,
-            modifier = Modifier.fillMaxWidth().height(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
         )
     }
@@ -213,5 +220,13 @@ fun WorkoutItemPreview() {
     WorkoutItem(
         exercise = Exercise(
             name = "Exercise 1",
-            lastLog = ExerciseLog(sets = listOf(10 to 100, 9 to 80, 8 to 70))))
+            lastLog = ExerciseLog(
+                sets = listOf(
+                    RepsToWeight(reps = 10, weight = 20),
+                    RepsToWeight(reps = 12, weight = 25),
+                    RepsToWeight(reps = 15, weight = 30),
+                )
+            )
+        )
+    )
 }

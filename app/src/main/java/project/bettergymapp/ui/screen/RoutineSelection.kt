@@ -37,6 +37,7 @@ fun RoutineSelection(
     onNavigateToExerciseAdd: (routine: Routine) -> Unit,
     viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
     onStart: (Routine) -> Unit = {},
+
 ) {
     val list = viewModel.list.collectAsStateWithLifecycle().value
     Log.d("RoutineSelection", "list: $list")
@@ -66,8 +67,8 @@ fun RoutineSelection(
             )
             IconButton(
                 onClick = {
-                    //onNavigateToRoutineAdd()
-                    addRoutine.value = true
+                    onNavigateToRoutineAdd()
+                    //addRoutine.value = true
                 },
                 modifier = Modifier.size(48.dp) // Adjust the size as needed
             ) {
@@ -92,7 +93,7 @@ fun RoutineSelection(
                 onConfirmation = { name ->
                     if (name != "") {
 
-                        viewModel.insert(Routine(
+                        viewModel.upsert(Routine(
                             id = viewModel.highestId() + 1,
                             name = name,
                             exercises = emptyList(),

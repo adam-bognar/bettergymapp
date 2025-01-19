@@ -34,10 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import project.bettergymapp.MainActivity
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.retrofit.ExerciseFromApi
@@ -50,8 +46,7 @@ import retrofit2.Response
 fun ExerciseScreen(
     routine: Routine,
     onNavigateBack: () -> Unit = {},
-    onSelected:(Routine) -> Unit
-
+    onSelected: (Routine) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var exercises by remember { mutableStateOf(listOf<ExerciseFromApi>()) }
@@ -127,7 +122,8 @@ fun ExerciseScreen(
                         muscles[muscle],
                         isSelected = selectedButton == muscles[muscle],
                         onClick = {
-                            selectedButton = if (selectedButton == muscles[muscle]) null else muscles[muscle]
+                            selectedButton =
+                                if (selectedButton == muscles[muscle]) null else muscles[muscle]
                             Log.d("ExerciseScreen", "Selected button: $selectedButton")
                         }
                     )
@@ -139,11 +135,15 @@ fun ExerciseScreen(
                 ExerciseCard(exercises[exercise].name,
                     onClick = {
                         val updatedExercises = routine.exercises.toMutableList()
-                        updatedExercises.add(Exercise(name = exercises[exercise].name))
+                        updatedExercises.add(Exercise(
+                            id = exercises[exercise].id,
+                            name = exercises[exercise].name
+                        ))
                         val updatedRoutine = routine.copy(exercises = updatedExercises)
                         //updateRoutineInDatabase(updatedRoutine)
 
                         onSelected(updatedRoutine)
+
                         onNavigateBack()
 
                     }
@@ -153,11 +153,6 @@ fun ExerciseScreen(
     }
 }
 
-private fun updateRoutineInDatabase(routine: Routine) {
-    CoroutineScope(Dispatchers.IO).launch {
-        MainActivity.routineRepository.update(routine)
-    }
-}
 
 private fun fetch(name: String, muscleGroup: String?, onFetched: (List<ExerciseFromApi>) -> Unit) {
     val call = if (name.isNotEmpty() || muscleGroup != null) {

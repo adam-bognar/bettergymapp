@@ -1,5 +1,6 @@
 package project.bettergymapp.ui.screen
 
+import RoutineCard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -96,7 +97,7 @@ fun RoutineList(
                 val currentList = remember { mutableStateOf(list[page].exercises) }
 
                 Column {
-                    RoutineCard(list[page].name, colors[page])
+                    RoutineCard(list[page].name, colors[page],false)
 
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         if (addExercise.value) {
@@ -118,7 +119,7 @@ fun RoutineList(
                                         currentList.value += tempList[0]
                                         list[page].exercises = currentList.value
                                         CoroutineScope(Dispatchers.IO).launch {
-                                            MainActivity.routineRepository.update(list[page])
+                                            MainActivity.routineRepository.upsert(list[page])
                                         }
                                         addExercise.value = false
                                         focusManager.clearFocus()
@@ -134,7 +135,7 @@ fun RoutineList(
                                         currentList.value -= currentList.value[exercise]
                                         list[page].exercises = currentList.value
                                         CoroutineScope(Dispatchers.IO).launch {
-                                            MainActivity.routineRepository.update(list[page])
+                                            MainActivity.routineRepository.upsert(list[page])
                                         }
                                     }
                                 } else {

@@ -34,15 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import project.bettergymapp.MainActivity
 import project.bettergymapp.R
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.viewmodel.RoutineViewModel
 
 @Composable
 fun RoutineEditScreen(
@@ -50,6 +48,7 @@ fun RoutineEditScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToExerciseScreen: (routine: Routine) -> Unit = {},
     navController: NavController,
+    viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
 ) {
     var routineName by remember { mutableStateOf(routine.name) }
     var exercises by remember { mutableStateOf(routine.exercises) }
@@ -76,12 +75,7 @@ fun RoutineEditScreen(
         RoutineEditHeader(
             onNavigateBack = onNavigateBack,
             onSaved = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    MainActivity.routineRepository.insert(Routine(
-                        name = routineName, exercises = exercises,
-                        description = ""
-                    ))
-                }
+                viewModel.upsert(routine.copy(name = routineName, exercises = exercises))
             }
         )
         TextField(

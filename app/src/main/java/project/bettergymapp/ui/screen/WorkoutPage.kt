@@ -1,6 +1,7 @@
 package project.bettergymapp.ui.screen
 
 import Timer
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,13 +28,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.Session
+import project.bettergymapp.data.repository.Exercise.ExerciseViewModel
+import project.bettergymapp.data.repository.Session.SessionViewModel
 import project.bettergymapp.data.viewmodel.RoutineViewModel
 
 @Composable
 fun WorkoutPage(
     routine: Routine,
     onNavigateBack: () -> Unit,
-    viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
+    routineViewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
+    exerciseViewModel: ExerciseViewModel = viewModel(factory = ExerciseViewModel.Factory),
+    sessionViewModel: SessionViewModel = viewModel(factory = SessionViewModel.Factory)
 ) {
     var exercises by remember { mutableStateOf(routine.exercises) }
     val addExercise = remember { mutableStateOf(false) }
@@ -54,7 +60,9 @@ fun WorkoutPage(
             WorkoutHeader(
                 name = routine.name,
                 onFinish = {
-                    viewModel.update(routine.copy(exercises = exercises))
+                    routineViewModel.upsert(routine.copy(exercises = exercises))
+                    exercisesToFireBase(exercises, exerciseViewModel)
+                    sessionToFirebase(exercises, sessionViewModel)
                     onNavigateBack()
                 },
                 onTimerClick = { showTimerSettings = true },
@@ -139,8 +147,26 @@ fun WorkoutPage(
             )
         }
     }
+
 }
 
+fun sessionToFirebase(exercises: List<Exercise>, sessionViewModel: SessionViewModel) {
+    val session = Session(
+        id=sessionViewModel.highestId()+1,
+        //date = Timestamp.now(),
+        duration = 0,
+        log = exercises
+    )
+    Log.d("sessionToFirebase", "Session: $session")
+    sessionViewModel.upsert(session)
+}
+
+fun exercisesToFireBase(exercises: List<Exercise>, exerciseViewModel: ExerciseViewModel) {
+    for (exercise in exercises) {
+        exerciseViewModel.upsert(exercise)
+        Log.d("exercisesToFireBase", "Exercise: $exercise")
+    }
+}
 
 
 @Preview(showBackground = true)

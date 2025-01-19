@@ -1,6 +1,5 @@
-package project.bettergymapp.data.viewmodel
+package project.bettergymapp.data.repository.Session
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -11,39 +10,56 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import project.bettergymapp.MainActivity
-import project.bettergymapp.data.Routine
-import project.bettergymapp.data.repository.IRoutineRepository
+import project.bettergymapp.data.Session
+import project.bettergymapp.data.repository.ISessionRepository
 
-class RoutineViewModel(
-    private val repository: IRoutineRepository
+class SessionViewModel(
+    private val repository: ISessionRepository
 ) : ViewModel() {
-    private val _list = MutableStateFlow<List<Routine>>(listOf())
+    private val _list = MutableStateFlow<List<Session>>(listOf())
     val list = _list.asStateFlow()
 
 
     init {
-        getAllRoutines()
-        Log.d("RoutineViewModel", "list: $_list")
+        getAllSessions()
     }
 
-    private fun getAllRoutines() {
-
-
+    private fun getAllSessions() {
         viewModelScope.launch {
-            repository.getAllRoutines().collectLatest {
+            repository.getAllSessions().collectLatest {
                 _list.tryEmit(it)
             }
         }
     }
 
-    fun routineCount(): Int {
+    fun sessionCount(): Int {
         return _list.value.size
     }
 
-    fun getRoutine(index: Int): Routine {
+    fun getSession(index: Int): Session {
         return _list.value[index]
     }
 
+    fun upsert(item: Session) {
+        viewModelScope.launch {
+            try {
+                repository.upsert(item)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
+    fun delete(item: Session) {
+        viewModelScope.launch {
+            try {
+                repository.delete(item)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
     fun highestId(): Int {
         var highestId = 0
         viewModelScope.launch {
@@ -56,43 +72,16 @@ class RoutineViewModel(
         return highestId
     }
 
-    fun upsert(item: Routine) {
-        viewModelScope.launch {
-            try {
-                repository.upsert(item)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 
-
-    fun delete(item: Routine) {
-        viewModelScope.launch {
-            try {
-                repository.delete(item)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun save() {
-        viewModelScope.launch {
-            try {
-                repository.save()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                RoutineViewModel(repository = MainActivity.routineRepository)
+                SessionViewModel(repository = MainActivity.sessionRepository)
             }
         }
     }
+
+
 }

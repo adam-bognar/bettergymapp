@@ -28,7 +28,6 @@ class SplashViewModel @Inject constructor(
             MainActivity.exerciseRepository = ExerciseRepositoryImpl(db, accountService.currentUserId)
             MainActivity.sessionRepository = SessionRepositoryImpl(db, accountService.currentUserId)
 
-
         openAndPopUp(HOME_SCREEN)
     }
     else openAndPopUp(SIGN_IN_SCREEN)

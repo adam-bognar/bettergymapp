@@ -32,32 +32,13 @@ class RoutinesRepositoryImpl(
 
     override fun getAllRoutines(): Flow<List<Routine>> = _routinesFlow.asStateFlow()
 
-    override suspend fun insert(routine: Routine) {
-        collection.add(routine).addOnSuccessListener {
-
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+    override suspend fun upsert(routine: Routine) {
+        collection.document(routine.id.toString()).set(routine)
     }
 
     override suspend fun delete(routine: Routine) {
         val routineDoc = collection.document(routine.id.toString())
-        routineDoc.delete().addOnSuccessListener {
-            _routinesFlow.value -= routine
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
-    }
-
-    override suspend fun update(routine: Routine) {
-        val routineDoc = collection.document(routine.id.toString())
-        routineDoc.set(routine).addOnSuccessListener {
-            _routinesFlow.value = _routinesFlow.value.map {
-                if (it.id == routine.id) routine else it
-            }
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
+        routineDoc.delete()
     }
 
     override suspend fun highestId(): Int {
