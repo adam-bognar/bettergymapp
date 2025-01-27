@@ -25,14 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import com.google.firebase.Timestamp
 import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.Session
 import project.bettergymapp.data.repository.Exercise.ExerciseViewModel
 import project.bettergymapp.data.repository.Session.SessionViewModel
-import project.bettergymapp.data.viewmodel.RoutineViewModel
+import project.bettergymapp.data.repository.Routine.RoutineViewModel
 
 @Composable
 fun WorkoutPage(
@@ -41,8 +41,7 @@ fun WorkoutPage(
     routineViewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
     exerciseViewModel: ExerciseViewModel = viewModel(factory = ExerciseViewModel.Factory),
     sessionViewModel: SessionViewModel = viewModel(factory = SessionViewModel.Factory),
-    onNavigateToExerciseAdd: (routine: Routine) -> Unit,
-    navController: NavController
+    onNavigateToExerciseAdd: (routine: Routine) -> Unit
 ) {
     var exercises by remember { mutableStateOf(routineViewModel.getRoutine(routine.id).exercises) }
     Log.d("WorkoutPage", "exercises: $exercises")
@@ -148,7 +147,7 @@ fun WorkoutPage(
 fun sessionToFirebase(exercises: List<Exercise>, sessionViewModel: SessionViewModel) {
     val session = Session(
         id = sessionViewModel.highestId() + 1,
-        //date = Timestamp.now(),
+        date = Timestamp.now(),
         duration = 0,
         log = exercises
     )

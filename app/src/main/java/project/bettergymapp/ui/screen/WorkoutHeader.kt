@@ -65,7 +65,6 @@ fun WorkoutHeader(
             )
         }
 
-
         Row (
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -90,15 +89,12 @@ fun WorkoutHeader(
             ) {
                 Text("Finish",
                     style = TextStyle(
-                        color = colorResource(id = R.color.white),
+                        color = Color.White,
                         fontSize = 17.sp
                     )
                 )
             }
         }
-
-
-
     }
 }
 

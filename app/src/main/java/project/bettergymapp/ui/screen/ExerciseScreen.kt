@@ -34,10 +34,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.repository.Exercise.ExerciseViewModel
 import project.bettergymapp.data.retrofit.ExerciseFromApi
 import project.bettergymapp.data.retrofit.RetrofitClient
+import project.bettergymapp.ui.screen.exercise.ExerciseCard
+import project.bettergymapp.ui.screen.routines.RoutineEditHeader
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,7 +50,8 @@ import retrofit2.Response
 fun ExerciseScreen(
     routine: Routine,
     onNavigateBack: () -> Unit = {},
-    onSelected: (Routine) -> Unit
+    onSelected: (Routine) -> Unit,
+    viewModel: ExerciseViewModel = viewModel(factory = ExerciseViewModel.Factory)
 ) {
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var exercises by remember { mutableStateOf(listOf<ExerciseFromApi>()) }
@@ -70,8 +75,7 @@ fun ExerciseScreen(
         RoutineEditHeader(
             onNavigateBack = {
                 onNavigateBack()
-            },
-            onSaved = {}
+            }
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(
@@ -134,13 +138,19 @@ fun ExerciseScreen(
             items(exercises.size) { exercise ->
                 ExerciseCard(exercises[exercise].name,
                     onClick = {
+
+
                         val updatedExercises = routine.exercises.toMutableList()
-                        updatedExercises.add(Exercise(
-                            id = exercises[exercise].id,
-                            name = exercises[exercise].name
-                        ))
+                        val updatedExercise: Exercise = if(viewModel.exerciseExists(exercises[exercise].id)){
+                            viewModel.getExercise(exercises[exercise].id)
+                        }else{
+                            Exercise(
+                                id = exercises[exercise].id,
+                                name = exercises[exercise].name
+                            )
+                        }
+                        updatedExercises.add(updatedExercise)
                         val updatedRoutine = routine.copy(exercises = updatedExercises)
-                        //updateRoutineInDatabase(updatedRoutine)
 
                         onSelected(updatedRoutine)
 

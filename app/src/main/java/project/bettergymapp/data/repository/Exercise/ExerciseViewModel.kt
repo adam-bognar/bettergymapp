@@ -36,7 +36,21 @@ class ExerciseViewModel(
     }
 
     fun getExercise(index: Int): Exercise {
-        return _list.value[index]
+        for (exercise in _list.value) {
+            if (exercise.id == index) {
+                return exercise
+            }
+        }
+        return Exercise()
+    }
+
+    fun exerciseExists(id: Int): Boolean {
+        for (exercise in _list.value) {
+            if (exercise.id == id) {
+                return true
+            }
+        }
+        return false
     }
 
     fun upsert(item: Exercise) {

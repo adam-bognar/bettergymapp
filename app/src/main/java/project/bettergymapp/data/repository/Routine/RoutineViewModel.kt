@@ -1,4 +1,4 @@
-package project.bettergymapp.data.viewmodel
+package project.bettergymapp.data.repository.Routine
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import project.bettergymapp.MainActivity
 import project.bettergymapp.data.Routine
-import project.bettergymapp.data.repository.IRoutineRepository
 
 class RoutineViewModel(
     private val repository: IRoutineRepository

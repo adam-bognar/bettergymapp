@@ -11,7 +11,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.R
+
 
 @Composable
 fun TopAppBar(
@@ -35,11 +35,11 @@ fun TopAppBar(
             .padding(start = 10.dp)
     ) {
         Row {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column {
                 // First line of text
                 Text(
                     text = stringResource(R.string.hello, username),
-                    color = Color.Black,
+                    color = colorResource(R.color.beige),
                     modifier = Modifier.padding(top = 10.dp),
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
@@ -49,7 +49,7 @@ fun TopAppBar(
                 // Second line of text
                 Text(
                     text = stringResource(R.string.ready),
-                    color = Color.Black,
+                    color = colorResource(R.color.beige),
                     modifier = Modifier.padding(top = 3.dp),
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
@@ -57,19 +57,34 @@ fun TopAppBar(
                     )
                 )
 
-                Button(
-                    onClick = {
-                        viewModel.onSignOutClick(openAndPopUp)
-                    },
-                    modifier = Modifier.padding(top = 5.dp)
-                ) {
-                    Text(
-                        text = ("sign out"),
-                        color = Color.Black
-                    )
-                }
 
             }
+
+            Button(
+                onClick = {
+                    viewModel.onSignOutClick(openAndPopUp)
+                },
+                modifier = Modifier.padding(top = 5.dp)
+            ) {
+                Text(
+                    text = ("sign out"),
+                    color = colorResource(R.color.beige)
+                )
+            }
+            Button(
+                onClick = {
+
+                },
+                modifier = Modifier.padding(top = 5.dp)
+            ) {
+                Text(
+                    text = ("theme"),
+                    color = colorResource(R.color.beige)
+                )
+            }
         }
-    }
-}
+
+
+
+}}
+

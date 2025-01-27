@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import project.bettergymapp.data.Routine
-import project.bettergymapp.data.repository.IRoutineRepository
 
 class RoutinesRepositoryImpl(
     db: FirebaseFirestore, user: String
@@ -47,16 +46,6 @@ class RoutinesRepositoryImpl(
         return _routinesFlow.value.maxOfOrNull { it.id } ?: 0
     }
 
-    override suspend fun deleteAll() {
-        collection.get().addOnSuccessListener { snapshot ->
-            for (document in snapshot.documents) {
-                document.reference.delete()
-            }
-            _routinesFlow.value = emptyList()
-        }.addOnFailureListener { exception ->
-            // Handle exception
-        }
-    }
 
     override suspend fun save() {
         val routines = _routinesFlow.value

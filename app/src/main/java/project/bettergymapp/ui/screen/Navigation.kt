@@ -18,7 +18,8 @@ import project.bettergymapp.SIGN_UP_SCREEN
 import project.bettergymapp.SPLASH_SCREEN
 import project.bettergymapp.WORKOUT_SCREEN
 import project.bettergymapp.data.Routine
-import project.bettergymapp.data.viewmodel.RoutineViewModel
+import project.bettergymapp.data.repository.Routine.RoutineViewModel
+import project.bettergymapp.ui.screen.routines.RoutineEditScreen
 import project.bettergymapp.ui.screen.sign_in.LoginPage
 import project.bettergymapp.ui.screen.sign_up.RegisterPage
 import project.bettergymapp.ui.screen.splash.SplashScreen
@@ -66,7 +67,6 @@ fun NavGraph(
                     val routineJson2 = Gson().toJson(update)
                     navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson2")
                 },
-                navController = navController
             )
         }
 
@@ -77,7 +77,7 @@ fun NavGraph(
 
             RoutineEditScreen(
                 onNavigateBack = {
-                    navController.navigate(HOME_SCREEN)
+                    navController.popBackStack()
                 },
                 onNavigateToExerciseScreen = { routine ->
                     val routineJson2 = Gson().toJson(routine)
