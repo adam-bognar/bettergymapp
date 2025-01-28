@@ -21,7 +21,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,30 +50,32 @@ fun RoutineEditScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToExerciseScreen: (routine: Routine) -> Unit = {},
     navController: NavController,
-    viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
+    viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
 ) {
     var routineName by remember { mutableStateOf(routine.name) }
+    Log.d("pacos", "Routine name: $routineName")
     var exercises by remember { mutableStateOf(routine.exercises) }
+
 
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
-    savedStateHandle?.getLiveData<String>("updatedRoutine")?.observeAsState()?.value?.let { routineJson ->
-        val updatedRoutine = Gson().fromJson(routineJson, Routine::class.java)
-        routineName = updatedRoutine.name
-        exercises = updatedRoutine.exercises
-        savedStateHandle.remove<String>("updatedRoutine")
-        Log.d("RoutineEditScreen", "haló")
-    }
+    savedStateHandle?.getLiveData<String>("updatedRoutine")
+        ?.observeAsState()?.value?.let { routineJson ->
+                val updatedRoutine = Gson().fromJson(routineJson, Routine::class.java)
+                routineName = updatedRoutine.name
+                exercises = updatedRoutine.exercises
+            savedStateHandle.getLiveData<String>("updatedRoutine").value = null
+            savedStateHandle.remove<String>("updatedRoutine")
 
-    LaunchedEffect(exercises) {
-        Log.d("RoutineEditScreen", "Exercises: ${exercises.joinToString { it.name }}")
-    }
+        }
+
 
 
     Box(
         modifier = Modifier
-        .fillMaxSize()
-        .background(colorResource(id = R.color.background))){
+            .fillMaxSize()
+            .background(colorResource(id = R.color.background))
+    ) {
         Column {
 
             RoutineEditHeader(
@@ -86,9 +87,13 @@ fun RoutineEditScreen(
 
             OutlinedTextField(
                 value = routineName,
-                onValueChange = { routineName = it  },
+                onValueChange = {
+                    routineName = it
+                },
                 label = { Text("Routine name") },
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     colorResource(id = R.color.text_color),
@@ -112,10 +117,15 @@ fun RoutineEditScreen(
                     )
                 }
 
-                item{
+                item {
                     TextButton(
                         onClick = {
-                            onNavigateToExerciseScreen(routine.copy(name = routineName, exercises = exercises))
+                            onNavigateToExerciseScreen(
+                                routine.copy(
+                                    name = routineName,
+                                    exercises = exercises
+                                )
+                            )
 
                         },
                         modifier = Modifier
@@ -177,6 +187,6 @@ fun RoutineEditScreenPreview() {
         onNavigateBack = {},
         onNavigateToExerciseScreen = {},
         navController = rememberNavController(),
-        viewModel = mockViewModel
+        viewModel = mockViewModel,
     )
 }

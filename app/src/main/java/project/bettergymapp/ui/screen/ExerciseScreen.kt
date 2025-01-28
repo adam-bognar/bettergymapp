@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.repository.Exercise.ExerciseViewModel
+import project.bettergymapp.data.repository.Exercise.MockExerciseRepository
 import project.bettergymapp.data.retrofit.ExerciseFromApi
 import project.bettergymapp.data.retrofit.RetrofitClient
 import project.bettergymapp.ui.screen.exercise.ExerciseCard
@@ -139,16 +140,18 @@ fun ExerciseScreen(
                 ExerciseCard(exercises[exercise].name,
                     onClick = {
 
-
+                        Log.d("ExerciseScreen", "clicked")
                         val updatedExercises = routine.exercises.toMutableList()
                         val updatedExercise: Exercise = if(viewModel.exerciseExists(exercises[exercise].id)){
                             viewModel.getExercise(exercises[exercise].id)
+
                         }else{
                             Exercise(
                                 id = exercises[exercise].id,
                                 name = exercises[exercise].name
                             )
                         }
+                        Log.d("ExerciseScreen", "Updated exercise: $updatedExercise")
                         updatedExercises.add(updatedExercise)
                         val updatedRoutine = routine.copy(exercises = updatedExercises)
 
@@ -189,22 +192,22 @@ private fun fetch(name: String, muscleGroup: String?, onFetched: (List<ExerciseF
     })
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun ExerciseScreenPreview() {
+    val sampleRoutine = Routine(
+        id = 1,
+        name = "Routine 1",
+        description = "",
+        exercises = emptyList()
+    )
+    val mockViewModel = ExerciseViewModel(repository = MockExerciseRepository()).apply {
+        // Initialize the ViewModel with any necessary data
+    }
     ExerciseScreen(
-        routine =
-        Routine(
-            name = "Chest Day",
-            exercises = listOf(
-                Exercise(name = "Bench Press"),
-                Exercise(name = "Incline Bench Press"),
-                Exercise(name = "Dumbbell Flyes")
-            ),
-            id = 1,
-            description = "TODO()"
-        ),
+        routine = sampleRoutine,
         onNavigateBack = {},
-        onSelected = {}
+        onSelected = {},
+        viewModel = mockViewModel
     )
 }

@@ -27,7 +27,7 @@ import project.bettergymapp.ui.screen.routines.RoutineList
 @Composable
 fun MainScreen(
     onNavigateToWorkout: (routine: Routine) -> Unit = {},
-    onNavigateToRoutineAdd: () -> Unit = {},
+    onNavigateToRoutineAdd: (Routine) -> Unit = {},
     onNavigateToExerciseAdd: (routine: Routine) -> Unit = {},
     openAndPopUp: (String) -> Unit = {},
     viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),

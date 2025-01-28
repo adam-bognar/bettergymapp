@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import project.bettergymapp.MainActivity
 import project.bettergymapp.data.Exercise
-import project.bettergymapp.data.repository.IExerciseRepository
 
 class ExerciseViewModel(
     private val repository: IExerciseRepository

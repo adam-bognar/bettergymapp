@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import project.bettergymapp.data.Exercise
-import project.bettergymapp.data.repository.IExerciseRepository
 
 class ExerciseRepositoryImpl(
     db: FirebaseFirestore, user: String

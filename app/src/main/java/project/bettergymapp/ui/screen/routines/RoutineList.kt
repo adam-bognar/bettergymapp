@@ -26,16 +26,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.repository.Routine.RoutineViewModel
 
 @Composable
 fun RoutineList(
     list: List<Routine>,
     onStart: (Routine) -> Unit = {},
-    onNavigateToRoutineAdd: () -> Unit,
+    onNavigateToRoutineAdd: (Routine) -> Unit,
     onRoutineDelete: (Routine) -> Unit = {},
+    viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
 ) {
     var showOptions by remember { mutableStateOf(false) }
     var selectedRoutine: Routine by remember { mutableStateOf(Routine()) }
@@ -68,7 +71,14 @@ fun RoutineList(
                 .align(Alignment.BottomEnd)
                 .padding(32.dp),
             onClick = {
-                onNavigateToRoutineAdd()
+                onNavigateToRoutineAdd(
+                    Routine(
+                        id = viewModel.highestId()+1,
+                        name = "",
+                        description = "",
+                        exercises = emptyList()
+                    )
+                )
             },
             shape = RoundedCornerShape(100),
             containerColor = colorResource(R.color.button_color),
@@ -94,7 +104,7 @@ fun RoutineList(
                 },
                 onRoutineDelete = onRoutineDelete,
                 onRoutineEdit = {
-                    //TODO
+                    onNavigateToRoutineAdd(it)
                 }
             )
 

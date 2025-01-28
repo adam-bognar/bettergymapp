@@ -39,8 +39,9 @@ fun NavGraph(
                     val routineJson = Gson().toJson(routine)
                     navController.navigate("$WORKOUT_SCREEN/$routineJson")
                 },
-                onNavigateToRoutineAdd = {
-                    navController.navigate(ROUTINE_ADD_SCREEN)
+                onNavigateToRoutineAdd = {routine ->
+                    val routineJson = Gson().toJson(routine)
+                    navController.navigate("$ROUTINE_ADD_SCREEN/$routineJson")
                 },
                 onNavigateToExerciseAdd = {
                         routine ->
@@ -71,23 +72,22 @@ fun NavGraph(
         }
 
         composable(
-            ROUTINE_ADD_SCREEN
-        ) {
-            val viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
+            route = "$ROUTINE_ADD_SCREEN/{routine}",
+            arguments = listOf(navArgument("routine") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val routineJson = backStackEntry.arguments?.getString("routine")
+            val routine = Gson().fromJson(routineJson, Routine::class.java)
+
 
             RoutineEditScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onNavigateToExerciseScreen = { routine ->
-                    val routineJson2 = Gson().toJson(routine)
+                onNavigateToExerciseScreen = { selectedRoutine ->
+                    val routineJson2 = Gson().toJson(selectedRoutine)
                     navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson2")
                 },
-                routine = Routine(
-                    id = viewModel.highestId() + 1,
-                    name = "",
-                    description = ""
-                ),
+                routine = routine,
                 navController = navController
             )
         }
@@ -116,15 +116,13 @@ fun NavGraph(
                                 // Handle the case when the previous screen was "home"
                                 viewModel.upsert(update)
                             }
-                            ROUTINE_ADD_SCREEN -> {
+                            "$ROUTINE_ADD_SCREEN/{routine}" -> {
                                 // Handle the case when the previous screen was "routine add"
                                 val updateRoutineJson = Gson().toJson(update)
                                 previousBackStackEntry.savedStateHandle.set("updatedRoutine", updateRoutineJson)
-                                Log.d("NavGraph", "Updated routine: ${update.exercises.joinToString { it.name }}")
                             }
                             "$WORKOUT_SCREEN/{routine}" -> {
                                 viewModel.upsert(update)
-                                Log.d("NavGraph", "Updated routine: ${update.exercises.joinToString { it.name }}")
                             }
                             // Add more cases as needed
                         }

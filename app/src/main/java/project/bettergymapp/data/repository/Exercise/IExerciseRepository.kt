@@ -1,4 +1,4 @@
-package project.bettergymapp.data.repository
+package project.bettergymapp.data.repository.Exercise
 
 import kotlinx.coroutines.flow.Flow
 import project.bettergymapp.data.Exercise
