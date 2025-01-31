@@ -1,13 +1,15 @@
-package project.bettergymapp.ui.screen
+package project.bettergymapp.ui.screen.workout
 
 import Timer
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,8 +33,11 @@ import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.Session
 import project.bettergymapp.data.repository.Exercise.ExerciseViewModel
-import project.bettergymapp.data.repository.Session.SessionViewModel
+import project.bettergymapp.data.repository.Exercise.MockExerciseRepository
+import project.bettergymapp.data.repository.Routine.MockRoutineRepository
 import project.bettergymapp.data.repository.Routine.RoutineViewModel
+import project.bettergymapp.data.repository.Session.MockSessionRepository
+import project.bettergymapp.data.repository.Session.SessionViewModel
 
 @Composable
 fun WorkoutPage(
@@ -56,19 +61,21 @@ fun WorkoutPage(
     ) {
         // Main content
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().background(colorResource(R.color.background))
         ) {
             WorkoutHeader(
                 name = routine.name,
                 onFinish = {
                     routineViewModel.upsert(routine.copy(exercises = exercises))
                     exercisesToFireBase(exercises, exerciseViewModel)
-                    sessionToFirebase(exercises, sessionViewModel)
+                    sessionToFirebase(routine.name,exercises, sessionViewModel)
                     onNavigateBack()
                 },
                 onTimerClick = { showTimerSettings = true },
                 onBack = { onNavigateBack() }
             )
+            HorizontalDivider(thickness = 3.dp, color = colorResource(R.color.routine_card))
+
 
             LazyColumn(
                 modifier = Modifier.weight(1f) // Allows LazyColumn to take up remaining space.
@@ -99,7 +106,7 @@ fun WorkoutPage(
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                                color = colorResource(id = R.color.happyblue)
+                                color = colorResource(id = R.color.button_color)
                             ),
                             textAlign = TextAlign.Center
                         )
@@ -144,9 +151,10 @@ fun WorkoutPage(
 
 }
 
-fun sessionToFirebase(exercises: List<Exercise>, sessionViewModel: SessionViewModel) {
+fun sessionToFirebase(name: String ,exercises: List<Exercise>, sessionViewModel: SessionViewModel) {
     val session = Session(
         id = sessionViewModel.highestId() + 1,
+        name = name,
         date = Timestamp.now(),
         duration = 0,
         log = exercises
@@ -172,10 +180,21 @@ fun WorkoutPagePreview() {
         Exercise(name = "Exercise 3"),
     )
 
-    val sampleRoutines = listOf(
-        Routine(name = "Routine 1", description = "", exercises = exercises),
-        Routine(name = "Routine 2", description = "", exercises = exercises)
-    )
+    val sampleRoutine = Routine(name = "Routine 1", description = "", exercises = exercises)
 
-    //WorkoutPage(routine = sampleRoutines[0])
+    val mockRoutineViewModel = RoutineViewModel(MockRoutineRepository()).apply {
+    }
+    val mockExerciseViewModel = ExerciseViewModel(MockExerciseRepository()).apply {
+    }
+    val mockSessionViewModel = SessionViewModel(MockSessionRepository()).apply {
+    }
+
+    WorkoutPage(
+        routine = sampleRoutine,
+        onNavigateBack = {},
+        routineViewModel = mockRoutineViewModel,
+        exerciseViewModel = mockExerciseViewModel,
+        sessionViewModel = mockSessionViewModel,
+        onNavigateToExerciseAdd = {}
+    )
 }

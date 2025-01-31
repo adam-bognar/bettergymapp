@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -22,13 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.R
-import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.repository.Routine.RoutineViewModel
 
@@ -113,20 +110,9 @@ fun RoutineList(
     }
 
 }
-
 @Preview(showBackground = true)
 @Composable
-fun PreviewRoutineList() {
-    val Exercise = listOf(
-        Exercise(name = "Exercise 1"),
-        Exercise(name = "Exercise 2")
-    )
-
-    val sampleRoutines = listOf(
-        Routine(name = "Routine 1", description = "", exercises = Exercise),
-        Routine(name = "Routine 2", description = "", exercises = Exercise)
-    )
-    val sampleColors = listOf(Color.Red, Color.Blue)
-    val pagerState = rememberPagerState(pageCount = { sampleRoutines.size })
-    RoutineList(list = sampleRoutines, onStart = {}, onNavigateToRoutineAdd = {})
+fun RoutineListPreview() {
+    val routine = Routine(name = "Routine 1", description = "")
+    RoutineList(list = listOf(routine), onStart = {}, onNavigateToRoutineAdd = {})
 }

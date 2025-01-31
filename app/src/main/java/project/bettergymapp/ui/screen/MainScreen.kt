@@ -32,9 +32,11 @@ fun MainScreen(
     openAndPopUp: (String) -> Unit = {},
     viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
 
-    ){
-    Column(modifier = Modifier.fillMaxSize()
-        .background(colorResource(R.color.background))
+    ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(R.color.background))
     )
     {
 //        TopAppBar(
@@ -42,11 +44,13 @@ fun MainScreen(
 //            openAndPopUp = openAndPopUp
 //        )
 
-
         val list by viewModel.list.collectAsStateWithLifecycle()
 
         Column(modifier = Modifier.padding(start = 10.dp, top = 20.dp, end = 10.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
                     text = stringResource(R.string.select_workout),
                     color = colorResource(R.color.text_color),
@@ -57,19 +61,15 @@ fun MainScreen(
                     )
                 )
             }
+            RoutineList(
+                list = list,
+                onStart = onNavigateToWorkout,
+                onNavigateToRoutineAdd = onNavigateToRoutineAdd,
+                onRoutineDelete = { routine ->
+                    viewModel.delete(routine)
+                }
+            )
 
-            if (list.isEmpty()) {
-                EmptyRoutineList()
-            } else {
-                RoutineList(
-                    list = list,
-                    onStart = onNavigateToWorkout,
-                    onNavigateToRoutineAdd = onNavigateToRoutineAdd,
-                    onRoutineDelete = { routine ->
-                        viewModel.delete(routine)
-                    }
-                )
-            }
 
         }
     }

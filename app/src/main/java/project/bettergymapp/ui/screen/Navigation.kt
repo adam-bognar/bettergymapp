@@ -19,10 +19,12 @@ import project.bettergymapp.SPLASH_SCREEN
 import project.bettergymapp.WORKOUT_SCREEN
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.repository.Routine.RoutineViewModel
+import project.bettergymapp.ui.screen.exercise.ExerciseScreen
 import project.bettergymapp.ui.screen.routines.RoutineEditScreen
 import project.bettergymapp.ui.screen.sign_in.LoginPage
 import project.bettergymapp.ui.screen.sign_up.RegisterPage
 import project.bettergymapp.ui.screen.splash.SplashScreen
+import project.bettergymapp.ui.screen.workout.WorkoutPage
 
 @Composable
 fun NavGraph(

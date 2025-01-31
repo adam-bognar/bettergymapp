@@ -1,4 +1,4 @@
-package project.bettergymapp.ui.screen
+package project.bettergymapp.ui.screen.exercise
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -30,18 +31,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.repository.Exercise.ExerciseViewModel
 import project.bettergymapp.data.repository.Exercise.MockExerciseRepository
 import project.bettergymapp.data.retrofit.ExerciseFromApi
 import project.bettergymapp.data.retrofit.RetrofitClient
-import project.bettergymapp.ui.screen.exercise.ExerciseCard
 import project.bettergymapp.ui.screen.routines.RoutineEditHeader
 import retrofit2.Call
 import retrofit2.Callback
@@ -71,13 +72,14 @@ fun ExerciseScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(colorResource(id = R.color.background))
     ) {
         RoutineEditHeader(
             onNavigateBack = {
                 onNavigateBack()
             }
         )
+        HorizontalDivider(thickness = 3.dp, color = colorResource(R.color.routine_card))
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier
@@ -97,9 +99,13 @@ fun ExerciseScreen(
                     .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    colorResource(id = R.color.text_color),
+                    unfocusedTextColor = colorResource(id = R.color.text_color),
+                    focusedBorderColor = colorResource(id = R.color.button_color),
+                    unfocusedBorderColor = colorResource(id = R.color.text_color),
+                    focusedLabelColor = colorResource(id = R.color.text_color),
+                    unfocusedLabelColor = colorResource(id = R.color.text_color),
+                    cursorColor = colorResource(id = R.color.text_color),
                 )
             )
             TextButton(
@@ -111,7 +117,9 @@ fun ExerciseScreen(
                     .align(Alignment.CenterVertically),
 
                 ) {
-                Text("Filter")
+                Text("Filter",
+                    color = colorResource(id = R.color.button_color),
+                    style = MaterialTheme.typography.titleMedium)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))

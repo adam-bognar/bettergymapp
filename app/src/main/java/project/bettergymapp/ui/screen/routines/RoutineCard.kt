@@ -73,7 +73,7 @@ Box(
             modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 10.dp, vertical = 10.dp),
             onClick = {
-                //TODO
+                onStartClick(routine)
             },
             colors = ButtonDefaults.buttonColors(colorResource(R.color.button_color))
         ) {

@@ -1,4 +1,4 @@
-package project.bettergymapp.ui.screen
+package project.bettergymapp.ui.screen.workout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

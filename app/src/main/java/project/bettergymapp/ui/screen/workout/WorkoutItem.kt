@@ -1,4 +1,4 @@
-package project.bettergymapp.ui.screen
+package project.bettergymapp.ui.screen.workout
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -12,10 +12,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +34,7 @@ import project.bettergymapp.R
 import project.bettergymapp.data.Exercise
 import project.bettergymapp.data.ExerciseLog
 import project.bettergymapp.data.RepsToWeight
+
 @Composable
 fun WorkoutItem(
     exercise: Exercise,
@@ -59,7 +56,7 @@ fun WorkoutItem(
             .fillMaxWidth()
             .padding(top = 10.dp, start = 10.dp, end = 10.dp)
             .clip(shape = RoundedCornerShape(20.dp))
-            .background(colorResource(id = R.color.top_app_bar))
+            .background(colorResource(id = R.color.routine_card))
     ) {
         Text(
             text = exercise.name,
@@ -69,7 +66,7 @@ fun WorkoutItem(
             style = TextStyle(
                 fontSize = 20.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                color = Color.Black
+                color = colorResource(id = R.color.text_color)
             ),
             textAlign = TextAlign.Center
         )
@@ -79,11 +76,11 @@ fun WorkoutItem(
                 .fillMaxWidth()
                 .padding(bottom = 18.dp)
         ) {
-            Text(text = "SET", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Text(text = "PREVIOUS", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Text(text = "KG", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Text(text = "REPS", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-            Text(text = "DONE", modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+            Text(text = "SET", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, color = colorResource(id = R.color.text_color))
+            Text(text = "PREVIOUS", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, color = colorResource(id = R.color.text_color))
+            Text(text = "KG", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, color = colorResource(id = R.color.text_color))
+            Text(text = "REPS", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, color = colorResource(id = R.color.text_color))
+            Text(text = "DONE", modifier = Modifier.weight(1f), textAlign = TextAlign.Center, color = colorResource(id = R.color.text_color))
         }
 
         logs.forEachIndexed { index, log ->
@@ -112,73 +109,13 @@ fun WorkoutItem(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Add Set")
+            Text(text = "Add Set",
+                color = colorResource(id = R.color.button_color))
         }
     }
 }
 
-@Composable
-private fun DataRow(
-    setNumber: Int,
-    previous: RepsToWeight,
-    onTick: (String, String, Boolean) -> Unit,
-) {
 
-    var kgInput by remember { mutableStateOf("") }
-    var repsInput by remember { mutableStateOf("") }
-    var isChecked by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-    ) {
-        Text(
-            text = setNumber.toString(),
-            modifier = Modifier
-                .weight(1f)
-                .height(24.dp),
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "${previous.weight}kg x ${previous.reps}",
-            modifier = Modifier
-                .weight(1f)
-                .height(24.dp),
-            textAlign = TextAlign.Center,
-            style = TextStyle(color = Color.Gray)
-
-        )
-        PlaceholderTextField(
-            value = kgInput,
-            onValueChange = { kgInput = it },
-            placeholder = previous.weight.toString(),
-            modifier = Modifier.weight(1f)
-        )
-        PlaceholderTextField(
-            value = repsInput,
-            onValueChange = { repsInput = it },
-            placeholder = previous.reps.toString(),
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(
-            onClick = {
-                isChecked = !isChecked
-                onTick(kgInput, repsInput, isChecked)
-
-            },
-            modifier = Modifier
-                .weight(1f)
-                .height(24.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Done",
-                tint = if (isChecked) Color.Green else Color.Black
-            )
-        }
-    }
-}
 
 @Composable
 fun PlaceholderTextField(
