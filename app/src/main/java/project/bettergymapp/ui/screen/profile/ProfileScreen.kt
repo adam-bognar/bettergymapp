@@ -34,17 +34,20 @@ import project.bettergymapp.R
 import project.bettergymapp.data.Session
 import project.bettergymapp.data.repository.Session.MockSessionRepository
 import project.bettergymapp.data.repository.Session.SessionViewModel
+import project.bettergymapp.ui.screen.BottomBar
 
 
 @Composable
 fun ProfileScreen(
     sessionViewModel: SessionViewModel = viewModel(factory = SessionViewModel.Factory),
+    navigateHome: () -> Unit,
+    onSignOutClick: (String) -> Unit,
 ) {
     var sessionsClicked by remember { mutableStateOf(false) }
     val sessionList by sessionViewModel.list.collectAsState()
     val sessionCount by remember { mutableIntStateOf(sessionViewModel.sessionCount()) }
 
-    var viewSession by remember { mutableStateOf(true) }
+    var viewSession by remember { mutableStateOf(false) }
     var selectedSession: Session by remember { mutableStateOf(Session()) }
 
     Box(
@@ -54,7 +57,8 @@ fun ProfileScreen(
     ){
         Column {
             ProfileHeader(
-                sessionCount = sessionCount
+                sessionCount = sessionCount,
+                onSignOutClick = onSignOutClick
             )
 
             Row(
@@ -97,19 +101,28 @@ fun ProfileScreen(
                 }
             }
 
-            if (sessionsClicked) {
-                LazyColumn { // This is a vertically scrolling list
-                    items(sessionList.size) { session ->
-                        SessionsCard(
-                            name = sessionList[session].name,
-                            date = dateToString(sessionList[session].date),
-                            onViewClick = {
-                                selectedSession = sessionList[session]
-                                viewSession = !viewSession                        }
-                        )
+            Box(modifier = Modifier.weight(1f)) {
+                if (sessionsClicked) {
+                    LazyColumn {
+                        items(sessionList.size) { session ->
+                            SessionsCard(
+                                name = sessionList[session].name,
+                                date = dateToString(sessionList[session].date),
+                                onViewClick = {
+                                    selectedSession = sessionList[session]
+                                    viewSession = !viewSession
+                                }
+                            )
+                        }
                     }
                 }
             }
+
+            BottomBar(
+                navigateHome = navigateHome,
+                navigateProfile = {},
+                from = "profile"
+            )
 
         }
         AnimatedVisibility(
@@ -151,7 +164,9 @@ fun ProfileScreenPreview() {
     val mockSessionViewModel = SessionViewModel(repository = MockSessionRepository())
 
     ProfileScreen(
-        sessionViewModel = mockSessionViewModel
+        sessionViewModel = mockSessionViewModel,
+        navigateHome = {},
+        onSignOutClick = {}
     )
 }
 

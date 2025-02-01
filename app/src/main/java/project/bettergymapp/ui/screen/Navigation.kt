@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import project.bettergymapp.EXERCISE_ADD_SCREEN
 import project.bettergymapp.HOME_SCREEN
+import project.bettergymapp.PROFILE_SCREEN
 import project.bettergymapp.ROUTINE_ADD_SCREEN
 import project.bettergymapp.SIGN_IN_SCREEN
 import project.bettergymapp.SIGN_UP_SCREEN
@@ -20,6 +21,7 @@ import project.bettergymapp.WORKOUT_SCREEN
 import project.bettergymapp.data.Routine
 import project.bettergymapp.data.repository.Routine.RoutineViewModel
 import project.bettergymapp.ui.screen.exercise.ExerciseScreen
+import project.bettergymapp.ui.screen.profile.ProfileScreen
 import project.bettergymapp.ui.screen.routines.RoutineEditScreen
 import project.bettergymapp.ui.screen.sign_in.LoginPage
 import project.bettergymapp.ui.screen.sign_up.RegisterPage
@@ -30,28 +32,23 @@ import project.bettergymapp.ui.screen.workout.WorkoutPage
 fun NavGraph(
     navController: NavHostController = rememberNavController()
 
-){
+) {
     NavHost(
         navController = navController,
         startDestination = SPLASH_SCREEN
-    ){
+    ) {
         composable(HOME_SCREEN) {
             MainScreen(
                 onNavigateToWorkout = { routine ->
                     val routineJson = Gson().toJson(routine)
                     navController.navigate("$WORKOUT_SCREEN/$routineJson")
                 },
-                onNavigateToRoutineAdd = {routine ->
+                onNavigateToRoutineAdd = { routine ->
                     val routineJson = Gson().toJson(routine)
                     navController.navigate("$ROUTINE_ADD_SCREEN/$routineJson")
                 },
-                onNavigateToExerciseAdd = {
-                        routine ->
-                    val routineJson = Gson().toJson(routine)
-                    navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson")
-                },
-                openAndPopUp = { destination ->
-                    navController.navigate(destination)
+                navigateProfile = {
+                    navController.navigate(PROFILE_SCREEN)
                 }
             )
         }
@@ -62,7 +59,8 @@ fun NavGraph(
         ) { backStackEntry ->
             val routineJson = backStackEntry.arguments?.getString("routine")
             val routine = Gson().fromJson(routineJson, Routine::class.java)
-            WorkoutPage(routine,
+            WorkoutPage(
+                routine,
                 onNavigateBack = {
                     navController.navigate(HOME_SCREEN)
                 },
@@ -94,7 +92,8 @@ fun NavGraph(
             )
         }
 
-        composable("$EXERCISE_ADD_SCREEN/{routine}",
+        composable(
+            "$EXERCISE_ADD_SCREEN/{routine}",
             arguments = listOf(navArgument("routine") { type = NavType.StringType })
         ) { backStackEntry ->
             val routineJson = backStackEntry.arguments?.getString("routine")
@@ -118,11 +117,16 @@ fun NavGraph(
                                 // Handle the case when the previous screen was "home"
                                 viewModel.upsert(update)
                             }
+
                             "$ROUTINE_ADD_SCREEN/{routine}" -> {
                                 // Handle the case when the previous screen was "routine add"
                                 val updateRoutineJson = Gson().toJson(update)
-                                previousBackStackEntry.savedStateHandle.set("updatedRoutine", updateRoutineJson)
+                                previousBackStackEntry.savedStateHandle.set(
+                                    "updatedRoutine",
+                                    updateRoutineJson
+                                )
                             }
+
                             "$WORKOUT_SCREEN/{routine}" -> {
                                 viewModel.upsert(update)
                             }
@@ -152,6 +156,16 @@ fun NavGraph(
         composable(SPLASH_SCREEN) {
             SplashScreen(
                 openAndPopUp = { destination ->
+                    navController.navigate(destination)
+                }
+            )
+        }
+        composable(PROFILE_SCREEN) {
+            ProfileScreen(
+                navigateHome = {
+                    navController.navigate(HOME_SCREEN)
+                },
+                onSignOutClick = { destination ->
                     navController.navigate(destination)
                 }
             )

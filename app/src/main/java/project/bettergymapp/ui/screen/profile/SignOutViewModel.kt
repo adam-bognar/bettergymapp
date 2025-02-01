@@ -1,4 +1,4 @@
-package project.bettergymapp.ui.screen
+package project.bettergymapp.ui.screen.profile
 
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer

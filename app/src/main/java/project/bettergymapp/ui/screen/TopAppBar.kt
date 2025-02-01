@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.R
+import project.bettergymapp.ui.screen.profile.SignOutViewModel
 
 
 @Composable
