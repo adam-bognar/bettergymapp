@@ -1,15 +1,14 @@
 package project.bettergymapp.data
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import java.time.LocalDate
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ServerTimestamp
 
-@Entity(tableName = "session")
-@TypeConverters(Converters::class)
 data class Session(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val date: LocalDate,
+    val id: Int = 0,
+    val name: String,
+    @ServerTimestamp val date: Timestamp? = null,
     val duration: Int,
     val log: List<Exercise>
-)
+){
+    constructor() : this(0,"", null, 0, emptyList())
+}

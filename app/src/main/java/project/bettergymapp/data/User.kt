@@ -1,9 +1,10 @@
 package project.bettergymapp.data
 
 data class User(
-    val id: String,
-    val username: String,
-    val email: String,
-    val routines: List<Routine>,
-    val sessions: List<Session>
-)
+    val uid: String,
+    val exercises: List<Exercise> = emptyList(),
+    val routines: List<Routine> = emptyList(),
+    val sessions: List<Session> = emptyList()
+){
+    constructor() : this("", emptyList(), emptyList(), emptyList())
+}

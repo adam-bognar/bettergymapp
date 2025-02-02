@@ -11,4 +11,6 @@ data class Routine(
     val name: String,
     val description: String,
     var exercises: List<Exercise> = emptyList()
-)
+){
+    constructor() : this(0, "", "", emptyList())
+}

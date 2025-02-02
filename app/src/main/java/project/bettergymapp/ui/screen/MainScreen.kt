@@ -1,27 +1,75 @@
 package project.bettergymapp.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import project.bettergymapp.R
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.repository.Routine.RoutineViewModel
+import project.bettergymapp.ui.screen.routines.RoutineList
 
 @Composable
 fun MainScreen(
     onNavigateToWorkout: (routine: Routine) -> Unit = {},
-    onNavigateToRoutineAdd: () -> Unit = {},
-    onNavigateToExerciseAdd: (routine: Routine) -> Unit = {}
-){
+    onNavigateToRoutineAdd: (Routine) -> Unit = {},
+    viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory),
+    navigateProfile: () -> Unit,
 
-
-    Column(modifier = Modifier.fillMaxSize()
-        .background(colorResource(R.color.beige))
+    ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(R.color.background))
     )
     {
-        TopAppBar("username")
-        RoutineSelection(onStart = onNavigateToWorkout, onNavigateToRoutineAdd = onNavigateToRoutineAdd, onNavigateToExerciseAdd = onNavigateToExerciseAdd)
+//        TopAppBar(
+//            "username",
+//            openAndPopUp = openAndPopUp
+//        )
+
+        val list by viewModel.list.collectAsStateWithLifecycle()
+
+        Text(
+            text = stringResource(R.string.select_workout),
+            color = colorResource(R.color.text_color),
+            modifier = Modifier.padding(top = 20.dp, start = 10.dp),
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp
+            )
+        )
+
+        Box(modifier = Modifier.weight(1f)) {
+            RoutineList(
+                list = list,
+                onStart = onNavigateToWorkout,
+                onNavigateToRoutineAdd = onNavigateToRoutineAdd,
+                onRoutineDelete = { routine ->
+                    viewModel.delete(routine)
+                }
+            )
+        }
+
+        BottomBar(
+            navigateHome = { },
+            navigateProfile = navigateProfile,
+            from = "home"
+        )
+
+
     }
 }

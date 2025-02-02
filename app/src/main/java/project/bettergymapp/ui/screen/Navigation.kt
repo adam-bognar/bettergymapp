@@ -2,6 +2,7 @@ package project.bettergymapp.ui.screen
 
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,74 +10,96 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import project.bettergymapp.MainActivity
+import project.bettergymapp.EXERCISE_ADD_SCREEN
+import project.bettergymapp.HOME_SCREEN
+import project.bettergymapp.PROFILE_SCREEN
+import project.bettergymapp.ROUTINE_ADD_SCREEN
+import project.bettergymapp.SIGN_IN_SCREEN
+import project.bettergymapp.SIGN_UP_SCREEN
+import project.bettergymapp.SPLASH_SCREEN
+import project.bettergymapp.WORKOUT_SCREEN
 import project.bettergymapp.data.Routine
+import project.bettergymapp.data.repository.Routine.RoutineViewModel
+import project.bettergymapp.ui.screen.exercise.ExerciseScreen
+import project.bettergymapp.ui.screen.profile.ProfileScreen
+import project.bettergymapp.ui.screen.routines.RoutineEditScreen
+import project.bettergymapp.ui.screen.sign_in.LoginPage
+import project.bettergymapp.ui.screen.sign_up.RegisterPage
+import project.bettergymapp.ui.screen.splash.SplashScreen
+import project.bettergymapp.ui.screen.workout.WorkoutPage
 
 @Composable
 fun NavGraph(
-    navController: NavHostController = rememberNavController(),
-){
+    navController: NavHostController = rememberNavController()
+
+) {
     NavHost(
         navController = navController,
-        startDestination = "home"
-    ){
-        composable("home") {
+        startDestination = SPLASH_SCREEN
+    ) {
+        composable(HOME_SCREEN) {
             MainScreen(
                 onNavigateToWorkout = { routine ->
                     val routineJson = Gson().toJson(routine)
-                    navController.navigate("workout/$routineJson")
+                    navController.navigate("$WORKOUT_SCREEN/$routineJson")
                 },
-                onNavigateToRoutineAdd = {
-                    navController.navigate("routine add")
-                },
-                onNavigateToExerciseAdd = {
-                        routine ->
+                onNavigateToRoutineAdd = { routine ->
                     val routineJson = Gson().toJson(routine)
-                    navController.navigate("exercise add/$routineJson")
+                    navController.navigate("$ROUTINE_ADD_SCREEN/$routineJson")
+                },
+                navigateProfile = {
+                    navController.navigate(PROFILE_SCREEN)
                 }
             )
         }
 
         composable(
-            route = "workout/{routine}",
+            route = "$WORKOUT_SCREEN/{routine}",
             arguments = listOf(navArgument("routine") { type = NavType.StringType })
         ) { backStackEntry ->
             val routineJson = backStackEntry.arguments?.getString("routine")
             val routine = Gson().fromJson(routineJson, Routine::class.java)
-            WorkoutPage(routine,
+            WorkoutPage(
+                routine,
                 onNavigateBack = {
-                    navController.navigate("home")
-                }
+                    navController.navigate(HOME_SCREEN)
+                },
+                onNavigateToExerciseAdd = { update ->
+                    val routineJson2 = Gson().toJson(update)
+                    navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson2")
+                },
             )
         }
 
         composable(
-            "routine add"
-        ) {
+            route = "$ROUTINE_ADD_SCREEN/{routine}",
+            arguments = listOf(navArgument("routine") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val routineJson = backStackEntry.arguments?.getString("routine")
+            val routine = Gson().fromJson(routineJson, Routine::class.java)
+
+
             RoutineEditScreen(
                 onNavigateBack = {
-                    navController.navigate("home")
+                    navController.popBackStack()
                 },
-                onNavigateToExerciseScreen = { routine ->
-                    val routineJson2 = Gson().toJson(routine)
-                    navController.navigate("exercise add/$routineJson2")
+                onNavigateToExerciseScreen = { selectedRoutine ->
+                    val routineJson2 = Gson().toJson(selectedRoutine)
+                    navController.navigate("$EXERCISE_ADD_SCREEN/$routineJson2")
                 },
-                routine = Routine(
-                    name = "",
-                    description = ""
-                ),
+                routine = routine,
                 navController = navController
             )
         }
 
-        composable("exercise add/{routine}",
+        composable(
+            "$EXERCISE_ADD_SCREEN/{routine}",
             arguments = listOf(navArgument("routine") { type = NavType.StringType })
         ) { backStackEntry ->
             val routineJson = backStackEntry.arguments?.getString("routine")
             val routine = Gson().fromJson(routineJson, Routine::class.java)
+            val viewModel: RoutineViewModel = viewModel(factory = RoutineViewModel.Factory)
+
             ExerciseScreen(
                 routine = routine,
                 onNavigateBack = {
@@ -85,25 +108,65 @@ fun NavGraph(
                 onSelected = { update ->
                     val previousBackStackEntry = navController.previousBackStackEntry
                     val previousRoute = previousBackStackEntry?.destination?.route
+                    Log.d("NavGraph", "Previous route: $previousRoute")
 
                     if (previousRoute != null) {
                         // Do something based on the previous route
                         when (previousRoute) {
-                            "home" -> {
+                            HOME_SCREEN -> {
                                 // Handle the case when the previous screen was "home"
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    MainActivity.routineRepository.update(update)
-                                }
+                                viewModel.upsert(update)
                             }
-                            "routine add" -> {
+
+                            "$ROUTINE_ADD_SCREEN/{routine}" -> {
                                 // Handle the case when the previous screen was "routine add"
                                 val updateRoutineJson = Gson().toJson(update)
-                                previousBackStackEntry.savedStateHandle.set("updatedRoutine", updateRoutineJson)
-                                Log.d("NavGraph", "Updated routine: ${update.exercises.joinToString { it.name }}")
+                                previousBackStackEntry.savedStateHandle.set(
+                                    "updatedRoutine",
+                                    updateRoutineJson
+                                )
+                            }
+
+                            "$WORKOUT_SCREEN/{routine}" -> {
+                                viewModel.upsert(update)
                             }
                             // Add more cases as needed
                         }
                     }
+                }
+            )
+        }
+
+        composable(SIGN_IN_SCREEN) {
+            LoginPage(
+                onLoginClick = { destination ->
+                    navController.navigate(destination)
+                },
+            )
+        }
+
+        composable(SIGN_UP_SCREEN) {
+            RegisterPage(
+                onRegisterClick = { destination ->
+                    navController.navigate(destination)
+                },
+            )
+        }
+
+        composable(SPLASH_SCREEN) {
+            SplashScreen(
+                openAndPopUp = { destination ->
+                    navController.navigate(destination)
+                }
+            )
+        }
+        composable(PROFILE_SCREEN) {
+            ProfileScreen(
+                navigateHome = {
+                    navController.navigate(HOME_SCREEN)
+                },
+                onSignOutClick = { destination ->
+                    navController.navigate(destination)
                 }
             )
         }

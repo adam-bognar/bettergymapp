@@ -2,24 +2,27 @@ package project.bettergymapp.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import project.bettergymapp.data.Session
-import project.bettergymapp.data.dao.ExerciseDao
 import project.bettergymapp.data.dao.SessionDao
 
-class RoomSessionRepository(private val dao: SessionDao) : ISessionRepository {
-    override fun getAllSessions(): Flow<List<Session>> {
+class RoomSessionRepository(private val dao: SessionDao)  {
+     fun getAllSessions(): Flow<List<Session>> {
        return dao.getAllSessions()
     }
 
-    override suspend fun insert(session: Session) {
+     suspend fun insert(session: Session) {
         dao.insert(session)
     }
 
-    override suspend fun delete(session: Session) {
+     suspend fun delete(session: Session) {
         dao.delete(session)
     }
 
-    override suspend fun update(session: Session) {
+     suspend fun update(session: Session) {
         dao.update(session)
+    }
+
+     suspend fun save() {
+        TODO("Not yet implemented")
     }
 
 }
